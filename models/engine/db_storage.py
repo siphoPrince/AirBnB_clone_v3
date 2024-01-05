@@ -11,7 +11,7 @@ from models.place import Place
 from models.review import Review
 from models.state import State
 from models.user import User
-from os import getenv
+from os import getenvsqlalchemy.exc.OperationalError: (MySQLdb._exceptions.OperationalError) (1045, "Access denied for user 'hbnb_dev'@'localhost' (using password: YES)")
 import sqlalchemy
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -74,3 +74,32 @@ class DBStorage:
     def close(self):
         """call remove() method on the private session attribute"""
         self.__session.remove()
+
+    def get(self, cls, id):
+        """
+        Retrieves one object by class and id.
+
+        Args:
+            cls (class): Class of the object.
+            id (str): ID of the object.
+
+        Returns:
+            object: The object if found, or None if not found.
+        """
+        key = "{}.{}".format(cls.__name__, id)
+        return self.all(cls).get(key)
+
+    def count(self, cls=None):
+        """
+        Counts the number of objects in storage.
+
+        Args:
+            cls (class, optional): Class of the objects (default is None).
+
+        Returns:
+            int: Number of objects in storage matching the given class.
+                 If no class is passed, returns the count of all objects.
+        """
+        if cls is None:
+            return sum(len(self.all(cls)) for cls in classes.values())
+        return len(self.all(cls))
